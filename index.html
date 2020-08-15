@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>single spa</title>
+</head>
+<body>
+  <a href="#/app1">app1</a>
+  <a href="#/app2">app2</a>
+  <a href="javascript: void 0" onclick="app3()">app3 绑定事件</a>
+  <a href="javascript: void 0" onclick="app4()">app4 绑定事件</a>
+
+  <script src="./lib/umd/single-spa.js"></script>
+  <script>
+    /**
+     * registerApplication 注册应用
+     * @params {string} name 应用名称
+     * @params {function} load 加载app的方法，必须是返回一个promise方法
+     * @params {function} router 路由判断条件
+     * @params {object} props 传给子应用的参数
+     */
+    singleSpa.registerApplication(
+      'app1',
+      async (props) => {
+        console.log('app1加载时执行')
+        // 期望子应用返回一个包含生命周期函数的对象
+        return {
+          bootstrap: [async (props) => {
+            console.log('bootstrap1', props)
+          }, async (props) => {
+            console.log('bootstrap2', props)
+          }],
+          mount: async () => {
+            console.log('mount')
+          },
+          unmount: async () => {
+            console.log('unmount')
+          }
+        }
+      },
+      location => location.hash.startsWith('#/app1'),
+      {store: {name: 'app', age: 10}}
+    )
+    singleSpa.registerApplication(
+      'app2',
+      async (props) => {
+        console.log('app2加载时执行')
+        // 期望子应用返回一个包含生命周期函数的对象
+        return {
+          bootstrap: [async (props) => {
+            console.log('app2 bootstrap1', props)
+          }],
+          mount: async () => {
+            console.log('app2 mount')
+          },
+          unmount: async () => {
+            console.log('app2 unmount')
+          }
+        }
+      },
+      location => location.hash.startsWith('#/app2'),
+      {store: {name: 'app', age: 10}}
+    )
+    singleSpa.registerApplication(
+      'app3',
+      async (props) => {
+        console.log('app3加载时执行')
+        // 期望子应用返回一个包含生命周期函数的对象
+        return {
+          bootstrap: [async (props) => {
+            console.log('bootstrap3', props)
+          }],
+          mount: async () => {
+            console.log('mount3')
+          },
+          unmount: async () => {
+            console.log('unmount3')
+          }
+        }
+      },
+      location => location.pathname.startsWith('/a'),
+    )
+    singleSpa.registerApplication(
+      'app4',
+      async (props) => {
+        console.log('app4加载时执行')
+        // 期望子应用返回一个包含生命周期函数的对象
+        return {
+          bootstrap: [async (props) => {
+            console.log('bootstrap4', props)
+          }],
+          mount: async () => {
+            console.log('mount4')
+          },
+          unmount: async () => {
+            console.log('unmount4')
+          }
+        }
+      },
+      location => location.pathname.startsWith('/b'),
+    )
+    singleSpa.start() // 启动应用
+
+    window.addEventListener('hashchange', () => {
+      console.log('hashchange handler')
+    })
+    function app3 () {
+      history.pushState({}, '', '/a')
+    }
+    function app4 () {
+      history.pushState({}, '', '/b')
+    }
+  </script>
+</body>
+</html>
