@@ -1,15 +1,19 @@
 import { reroute } from './reroute'
 
 // 路由拦截: hash路由/history路由
-export const routingEventsListeningTo = ['hashChange', 'popstate']
+export const routingEventsListeningTo = ['hashchange', 'popstate']
 
-function urlReroute () {
+function urlReroute (e) {
   reroute([], arguments) // 会根据路径重新加载不同的应用
+  // 执行用户传入的方法
+  if(capturedEventListeners[e.type]) {
+    capturedEventListeners[e.type].forEach(cb => cb())
+  }
 }
 
 // 后续挂载的事件先暂存起来，当应用加载完之后，依次执行
 const capturedEventListeners = {
-  hashChange: [],
+  hashchange: [],
   popstate: []
 }
 
